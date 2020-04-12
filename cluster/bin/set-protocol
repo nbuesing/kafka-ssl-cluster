@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+  echo "usage: $0 {SSL|PLAINTEXT}"
+  exit
+fi
+
+if [ $1 != "SSL" ] && [ $1 != "PLAINTEXT" ]; then
+  echo "usage: $0 {SSL|PLAINTEXT}"
+  exit
+fi
+
+PROTOCOL=$1
+shift
+
+sed -E -i .bak "s/(KAFKA_SECURITY_INTER_BROKER_PROTOCOL:) .*/\1 ${PROTOCOL}/" ./docker-compose.yml
+[ $? -eq 1 ] && echo "issue changing docker-compose.yml" && exit
+
+rm -f ./docker-compose.yml.bak
+
+
+

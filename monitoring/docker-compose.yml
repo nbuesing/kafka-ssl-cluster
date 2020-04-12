@@ -1,0 +1,32 @@
+---
+version: '3.7'
+
+networks:
+  default:
+    external:
+      name: kafka_network
+
+services:
+
+  prometheus:
+    hostname: prometheus
+    container_name: kafka_prometheus
+    image: prom/prometheus
+    privileged: true
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    hostname: grafana
+    container_name: kafka_grafana
+    image: grafana/grafana
+    ports:
+      - '3000:3000'
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: grafana
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+    volumes:
+      - ./grafana/grafana.db:/var/lib/grafana
+      - ./grafana/prometheus.yml:/etc/grafana/provisioning/datasources/prometheus.yml
+      - ./grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml
+      - ./grafana/dashboards:/var/lib/grafana/dashboards

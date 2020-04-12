@@ -2,3 +2,5 @@
 .idea
 .srl
 certs
+grafana.db
+docker-compose.yml.bak

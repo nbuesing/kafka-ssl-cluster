@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Make sure 'jq' is installed.
+command -v jq >/dev/null 2>&1 || { echo >&2 "jq required but is not installed."; exit 1; }
+
+declare -a MACHINES=("broker-1" "broker-2" "broker-3" "broker-4")
+
+URP="kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions"
+HOST=localhost
+
+declare -i urp
+
+function checkURP() {
+declare -i total=0
+for i in ${MACHINES[@]}; do
+  local _PORT=${i: -1}7072
+  local urp=$(curl -s http://${HOST}:${_PORT}/jolokia/read/${URP} | jq ".value.Value")
+  total=$(( $urp + $total ))
+done
+echo $total
+}
+
+for i in ${MACHINES[@]}; do
+  echo "restarting ${i}"
+  docker-compose stop ${i} && docker-compose up -d ${i}
+  [ $? -eq 1 ] && echo "unable to restart ${i} properly; manual restart required." && exit
+  while [ "$(checkURP)" -gt 0 ]; do
+    echo "waiting for UPD to be zero"
+    sleep 5;
+  done
+done
+
