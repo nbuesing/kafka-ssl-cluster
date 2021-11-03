@@ -44,7 +44,7 @@ keystore=${i}.keystore.jks
 printf "\ngenerating key, csr, crt, and p12 file for $i\n\n"
 
 printf "generate key\n============\n\n"
-openssl genrsa -aes128 -passout pass:${B_PW} -out ${CERTS}/${key} 3072
+openssl genrsa -aes256 -passout pass:${B_PW} -out ${CERTS}/${key} 4096
 [ $? -eq 1 ] && echo "unable to generate key for ${i}." && exit
 
 printf "\n\nverify key\n==========\n\n"

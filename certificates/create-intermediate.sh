@@ -28,7 +28,7 @@ echo "==============================="
 echo ""
 
 printf "\n\ncreated IN key and IN csr\n=========================\n\n"
-openssl req -newkey rsa:1024 -sha1 -passout pass:${IN_PW} -keyout ${CERTS}/${key} -out ${CERTS}/${req} -subj ${subject}
+openssl req -newkey rsa:4096 -sha256 -passout pass:${IN_PW} -keyout ${CERTS}/${key} -out ${CERTS}/${req} -subj ${subject}
 	-extensions ca \
 	-config <(cat ./openssl.cnf <(printf "\n[ext]\nbasicConstraints=CA:TRUE,pathlen:0"))
 [ $? -eq 1 ] && echo "unable to create IN key and csr" && exit
@@ -42,7 +42,7 @@ openssl req -text -noout -verify -in ${CERTS}/${req}
 [ $? -eq 1 ] && echo "unable to verify IN csr" && exit
 
 printf "\n\nsign IN csr\n===========\n\n"
-openssl x509 -req -CA ${CERTS}/ca.crt -CAkey ${CERTS}/ca.key -passin pass:${CA_PW} -in ${CERTS}/${req} -sha1 -days 365 -out ${CERTS}/${crt} -CAcreateserial \
+openssl x509 -req -CA ${CERTS}/ca.crt -CAkey ${CERTS}/ca.key -passin pass:${CA_PW} -in ${CERTS}/${req} -sha256 -days 365 -out ${CERTS}/${crt} -CAcreateserial \
 	-extensions ext \
 	-extfile <(cat ./openssl.cnf <(printf "\n[ext]\nbasicConstraints=CA:TRUE,pathlen:0"))
 [ $? -eq 1 ] && echo "unable to sign IN csr" && exit
